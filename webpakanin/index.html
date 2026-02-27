@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PakanIn IoT</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="aurora-container">
+        <div class="aurora-blob b1"></div>
+        <div class="aurora-blob b2"></div>
+        <div class="aurora-blob b3"></div>
+    </div>
+
+    <button class="mobile-menu-btn" onclick="playClickSound(); toggleMobileMenu()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="mobile-overlay" onclick="toggleMobileMenu()"></div>
+
+    <div class="app-container">
+        
+        <div class="sidebar" id="sidebarMenu">
+            <div class="logo-section">
+                <div class="brand-wrapper">
+                    <div class="logo-icon"><i class="fa-solid fa-fish-fins"></i></div>
+                    <span>Feeder</span>
+                </div>
+                <button class="close-menu-btn" onclick="toggleMobileMenu()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item active" onclick="playClickSound(); showPage('dashboard', this); toggleMobileMenu()">
+                    <span class="icon"><i class="fa-solid fa-house"></i></span> Dashboard
+                </li>
+                <li class="nav-item" onclick="playClickSound(); showPage('schedule', this); toggleMobileMenu()">
+                    <span class="icon"><i class="fa-solid fa-clock"></i></span> Schedule
+                </li>
+                <li class="nav-item" onclick="playClickSound(); showPage('history', this); toggleMobileMenu()">
+                    <span class="icon"><i class="fa-solid fa-chart-line"></i></span> History
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            
+            <header>
+                <h1>
+                    PakanIn <span class="highlight">IoT</span>
+                    <span class="floating-icon">🐟</span>
+                </h1>
+                <p>Smart Automatic Feeder System</p>
+                <div class="online-badge">
+                    <span class="dot"></span> System Online
+                </div>
+            </header>
+
+            <section id="page-dashboard" class="page-section active">
+                <div class="card status-card">
+                    <div class="card-header">
+                        <span><i class="fa-solid fa-eye"></i> Live Monitoring</span>
+                    </div>
+                    <div class="card-body status-layout">
+                        <div class="jar-wrapper">
+                            <div class="jar-container">
+                                <div id="food-fill" class="jar-liquid"></div>
+                                <div class="jar-reflection"></div>
+                            </div>
+                            <div id="persen-text" class="jar-text">--%</div>
+                        </div>
+
+                        <div class="status-info">
+                            <div id="status-badge-main" class="status-pill loading">Loading...</div>
+                            <div class="info-row">
+                                <span><i class="fa-solid fa-ruler-vertical"></i> Jarak Sensor</span>
+                                <strong id="jarak-text">-- cm</strong>
+                            </div>
+                            <div class="info-row">
+                                <span><i class="fa-solid fa-rotate"></i> Update Terakhir</span>
+                                <span id="last-update-text">...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card action-card">
+                    <div class="card-header">
+                        <span><i class="fa-solid fa-gamepad"></i> Control</span>
+                    </div>
+                    <div class="card-body">
+                        <button id="btn-feed" class="feed-button" onclick="playClickSound()">
+                            <div class="btn-content">
+                                <i class="fa-solid fa-utensils"></i>
+                                <span>Beri Makan Sekarang</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-schedule" class="page-section hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="fa-solid fa-calendar-check"></i> Automation</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="schedule-box">
+                            <div class="sch-left">
+                                <h3>Jadwal Harian</h3>
+                                <p>Servo Akan Aktif Otomatis Pada Jam Ini:</p>
+                            </div>
+                            <div class="sch-right">
+                                <input type="time" id="input-time" class="time-input">
+                                <label class="switch">
+                                    <input type="checkbox" id="toggle-schedule">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="save-area">
+                            <button id="btn-save-schedule" class="save-btn" onclick="playClickSound()">
+                                <i class="fa-solid fa-floppy-disk"></i> Simpan Jadwal
+                            </button>
+                            <p id="schedule-status"></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-history" class="page-section hidden">
+                <div class="card full-height">
+                    <div class="card-header">
+                        <span><i class="fa-solid fa-chart-area"></i> Statistik Pakan</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-wrapper">
+                            <canvas id="feedChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <audio id="click-sound" src="click.mp3" preload="auto"></audio>
+    <audio id="alert-sound" src="alert.mp3" preload="auto" loop ></audio>
+
+    <script>
+        function playClickSound() {
+            const audio = document.getElementById('click-sound');
+            if(audio) { audio.currentTime = 0; audio.play().catch(() => {}); }
+        }
+
+        function showPage(pageId, element) {
+            document.querySelectorAll('.page-section').forEach(sec => {
+                sec.classList.remove('active');
+                sec.classList.add('hidden');
+            });
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+
+            const target = document.getElementById('page-' + pageId);
+            if(target) {
+                target.classList.remove('hidden');
+                target.classList.add('active');
+            }
+            if(element) element.classList.add('active');
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebarMenu');
+            const overlay = document.querySelector('.mobile-overlay');
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('active-mobile');
+                overlay.classList.toggle('active');
+            }
+        }
+    </script>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
